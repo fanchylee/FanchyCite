@@ -29,7 +29,7 @@ mem.each{|i|
 		data.each{|key,value|
 			wikicontent=wikicontent+"|#{key} = #{value}\n"
 		}
-		wikicontent=wikicontent+"}}"
+		wikicontent=wikicontent+"|url=    <!--书籍链接-->\n|language=     <!--如果是简体中文请改为zh-hans，繁体中文为zh-hant-->\n|quote={{{quote|}}}<!--不要更改-->\n|page={{{page|}}}<!--不要更改-->\n|pages={{{pages|}}}<!--不要更改-->\n|ref={{{ref|}}}<!--不要更改-->\n}}"
 	end
 	wikititle=(isbn_nocheck.length == 9 ? "Template:Cite_isbn/978#{isbn_nocheck}" : "Template:Cite_isbn/#{isbn_nocheck}")
 	mw.create(wikititle, wikicontent)
