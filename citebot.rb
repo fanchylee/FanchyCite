@@ -11,7 +11,7 @@ zhwikihttp = Net::HTTP.new(zhwikiurl.host, zhwikiurl.port)
 $https_char=='s'? zhwikihttp.use_ssl=true : zhwikihttp.use_ssl=false
 
 mw = MediaWiki::Gateway.new("http#{$https_char}://zh.wikipedia.org/w/api.php")
-mw.login('Fanchy-bot','lpc/1991')
+mw.login('Fanchy-bot','bot/1991')
 
 
 mem=mw.category_members('分类:含未完成ISBN标签的页面')
