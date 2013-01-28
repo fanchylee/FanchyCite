@@ -16,8 +16,8 @@ mw.login('Fanchy-bot','bot/1991')
 
 mem=mw.category_members('分类:含未完成ISBN标签的页面')
 mem.each{|i|
-	content=zhwikihttp.request(Net::HTTP::Get.new((zhwikiurl.path+'/'+i).gsub(/ /,'_')))
-	isbn=/ISBN ([[:digit:]]{10,13}).+?单击这里.+?添加你的引用。.+?如果你仍在编辑主页面文章，你可能需要在一个新窗口打开。/m.match(content.body.force_encoding("UTF-8"))
+	content=zhwikihttp.request(Net::HTTP::Get.new((zhwikiurl.path+'/'+i).gsub(/ /,'_'))).body.force_encoding("UTF-8")
+	isbn=/ISBN ([[:digit:]]{10,13}).+?单击这里.+?添加你的引用。.+?如果你仍在编辑主页面文章，你可能需要在一个新窗口打开。/m.match(content)
 	next if isbn == nil
 	isbn=isbn[1]
 	isbn_nocheck=isbn[0..-2]
