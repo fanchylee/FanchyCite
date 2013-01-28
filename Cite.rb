@@ -10,14 +10,11 @@ module Cite
     end
 
     def get_nlc()
+      params = {:func=>'find-m',:request=>@isbn,:find_code=>'ISB'}
       uri = URI.parse('http://opac.nlc.gov.cn/F')
-      params = {'func'=>'find-m','request'=>@isbn,'find_code'=>'ISB'}
-      http = Net::HTTP.new(uri.host, uri.port) 
-      request = Net::HTTP::Get.new(uri.path) 
-      request.set_form_data( params )
-      request = Net::HTTP::Get.new( uri.path+ '?' + request.body ) 
+      uri.query=URI.encode_www_form(params)
+      response =  Net::HTTP.get_response(uri)
 
-      response = http.request(request)
       content=HTMLEntities.new.decode( response.body.force_encoding("UTF-8"))
       #content=HTMLEntities.new.decode(File.read('example').force_encoding("UTF-8"))
       ta=/题名与责任.+?<\/td>.+?<td.+?>.+?>.+?>[[:blank:]]*(?<t>.+?)[[:blank:]]*\[.+?\].+?\/[[:blank:]]*(?<a>.+?)[[:blank:]]*[著编]*<.+?<\/td>/m.match(content)

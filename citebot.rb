@@ -4,17 +4,16 @@ require 'media_wiki'
 require 'net/http'
 require 'net/https'
 require 'Cite'
-#$https_char='s'#if https NOT to be used, just comment this line OR change it to be nil
 
+#$https_char='s'#if https NOT to be used, just comment this line OR change it to be nil
 zhwikiurl = URI.parse("http#{$https_char}://zh.wikipedia.org/wiki")
 zhwikihttp = Net::HTTP.new(zhwikiurl.host, zhwikiurl.port)
 $https_char=='s'? zhwikihttp.use_ssl=true : zhwikihttp.use_ssl=false
 
 mw = MediaWiki::Gateway.new("http#{$https_char}://zh.wikipedia.org/w/api.php")
 mw.login('Fanchy-bot','bot/1991')
-
-
 mem=mw.category_members('分类:含未完成ISBN标签的页面')
+
 mem.each{|i|
 	content=zhwikihttp.request(Net::HTTP::Get.new((zhwikiurl.path+'/'+i).gsub(/ /,'_'))).body.force_encoding("UTF-8")
 	isbn=/ISBN ([[:digit:]]{10,13}).+?单击这里.+?添加你的引用。.+?如果你仍在编辑主页面文章，你可能需要在一个新窗口打开。/m.match(content)
