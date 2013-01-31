@@ -50,7 +50,9 @@ module Cite
 			when 'journal'
 				detail=/GetInfo\(.+?,\'(?<year>.+?)\',\'(?<issue>.+?)\',\'(?<journal>.+?)\'\)/.match(content)
 				title=/RegAd\(\'.+?\',\'.+?\',\'.+?\',\'.+?\',\'.+?\',\'(?<title>.+?)\'\)/.match(content)
-				@params={'title'=>title[:title], 'year'=>detail[:year], 'issue'=>detail[:issue], 'journal'=>detail[:journal]}
+				author=/【作者】.+?<a .+?>(?<author>.+?)<\/a>/m.match(content)
+				@params={'title'=>title[:title], 'year'=>detail[:year], 'issue'=>detail[:issue], 'journal'=>detail[:journal], 'author'=>author[:author]}
+			when 'newspaper'
 			end
 		end
 	end
