@@ -22,7 +22,7 @@ mem.each{|i|
 	isbn_nocheck=isbn[0..-2]
 	if mw.get(i) != nil
 		c=Cite::ISBN.new(isbn)
-		data=c.get_nlc()
+		data=c.get
 		next if data == nil
 		wikicontent="{{Cite book\n"
 		data.each{|key,value|
