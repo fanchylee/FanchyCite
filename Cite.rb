@@ -28,31 +28,48 @@ module Cite
 			@hash={"CCND"=>"newspaper", "CDFD"=>"dissertation_D", "CMFD"=>"dissertation_M", "IPFD"=>"conference_I", "CJFQ"=>"journal", "CPFD"=>"conference_C", "CYFD"=>"annual"}
 			@id=id
 			case prefix
-			when nil
+				when nil
 				@db_prefix=nil
 				@type='preprint'
-			else
+				else
 				@db_prefix=prefix
 				@type=@hash[prefix]
 			end
 		end
 		def get
 			case @type
-			when 'preprint'
+				when 'preprint'
 				uri=URI.parse('http://www.cnki.net/kcms/detail/'+@id)
-			else
+				else
 				uri = URI.parse('http://www.cnki.net/kcms/detail/detail.aspx')
 				uri.query=URI.encode_www_form({:FileName=>@id, :DbCode=>@db_prefix})
 			end	
 			response=Net::HTTP::get_response(uri)
 			content=HTMLEntities.new.decode( response.body.force_encoding("UTF-8"))
+			##
+			#title entry
+			title=/<span id="chTitle">(?<title>.+?)<\/span>/.match(content)[:title]
+			##
+			#author entry
 			case @type
-			when 'journal'
+				when 'journal', 'newspaper', 'conference_C', 'dissertation_M', 'dissertation_D', 'conference_I'
+				author=/【作者】.*?<a .+?>(?<author>.+?)<\/a>/m.match(content)[:author]
+				when 'annual'
+				author=/<div class="authorc"><a .+?>(?<author>.+?)<\/a>/m.match(content)[:author]
+			end
+			##
+			#date year publisher journal issue entry
+			case @type
+				when 'journal'
 				detail=/GetInfo\(.+?,\'(?<year>.+?)\',\'(?<issue>.+?)\',\'(?<journal>.+?)\'\)/.match(content)
-				title=/RegAd\(\'.+?\',\'.+?\',\'.+?\',\'.+?\',\'.+?\',\'(?<title>.+?)\'\)/.match(content)
-				author=/【作者】.+?<a .+?>(?<author>.+?)<\/a>/m.match(content)
-				@params={'title'=>title[:title], 'year'=>detail[:year], 'issue'=>detail[:issue], 'journal'=>detail[:journal], 'author'=>author[:author]}
-			when 'newspaper'
+				year=detail[:year]
+				issue=detail[:issue]
+				journal=detail[:journal]
+				@params={'title'=>title, 'author'=>author, 'year'=>detail[:year], 'issue'=>detail[:issue], 'journal'=>detail[:journal]}
+				when 'newspaper'
+				date=/【报纸日期】(?<date>[[:digit:]]{4}-[[:digit:]]{2}-[[:digit:]]{2})/.match(content)[:date]
+				publisher=/【报纸名称】.*?<a .+?>(?<publisher>.+?)<\/a>/m.match(content)[:publisher]
+				@params={'title'=>title, 'date'=>date, 'publisher'=>publisher, 'author'=>author}
 			end
 		end
 	end
