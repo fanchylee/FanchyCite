@@ -25,7 +25,8 @@ module Cite
 	end
 	class CNKI
 		def initialize(id, prefix)
-			@hash={"CCND"=>"newspaper", "CDFD"=>"dissertation_D", "CMFD"=>"dissertation_M", "IPFD"=>"conference_I", "CJFQ"=>"journal", "CPFD"=>"conference_C", "CYFD"=>"annual"}
+			@hash={"CCND"=>"newspaper", "CDFD"=>"thesis_D", "CMFD"=>"thesis_M", "IPFD"=>"conference_I", "CJFQ"=>"journal", "CPFD"=>"conference_C", "CYFD"=>"annual"}
+			@thesis_type={"thesis_M"=>"硕士论文", "thesis_D"=>"博士论文"}
 			@id=id
 			case prefix
 				when nil
@@ -52,13 +53,13 @@ module Cite
 			##
 			#author entry
 			case @type
-				when 'journal', 'newspaper', 'conference_C', 'dissertation_M', 'dissertation_D', 'conference_I'
+				when 'journal', 'newspaper', 'conference_C', 'thesis_M', 'thesis_D', 'conference_I'
 				author=/【作者】.*?<a .+?>(?<author>.+?)<\/a>/m.match(content)[:author]
 				when 'annual'
 				author=/<div class="authorc"><a .+?>(?<author>.+?)<\/a>/m.match(content)[:author]
 			end
 			##
-			#date year publisher journal issue entry
+			#date year publisher journal issue type entry
 			case @type
 				when 'journal'
 				detail=/GetInfo\(.+?,\'(?<year>.+?)\',\'(?<issue>.+?)\',\'(?<journal>.+?)\'\)/.match(content)
@@ -70,6 +71,10 @@ module Cite
 				date=/【报纸日期】(?<date>[[:digit:]]{4}-[[:digit:]]{2}-[[:digit:]]{2})/.match(content)[:date]
 				publisher=/【报纸名称】.*?<a .+?>(?<publisher>.+?)<\/a>/m.match(content)[:publisher]
 				@params={'title'=>title, 'date'=>date, 'publisher'=>publisher, 'author'=>author}
+				when 'thesis_M', 'thesis_D'
+				publisher=/【网络出版投稿人】.*?<a .+?>(?<publisher>.+?)<\/a>/m.match(content)[:publisher]
+				year=/【网络出版投稿时间】(?<yaer>[[:digit:]]{4})/.match(content)[:year]
+				type=@thesis_type[@type]
 			end
 		end
 	end
