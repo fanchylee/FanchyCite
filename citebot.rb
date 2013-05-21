@@ -1,9 +1,9 @@
 #! /usr/bin/ruby -I.
 # encoding: utf-8
-require 'media_wiki'
 require 'net/http'
 require 'net/https'
-require 'Cite'
+require 'media_wiki'
+require './Cite.rb'
 
 #$https_char='s'#if https NOT to be used, just comment this line OR change it to be nil
 zhwikiurl = URI.parse("http#{$https_char}://zh.wikipedia.org/wiki")
