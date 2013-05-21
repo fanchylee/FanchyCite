@@ -10,9 +10,9 @@ zhwikiurl = URI.parse("http#{$https_char}://zh.wikipedia.org/wiki")
 zhwikihttp = Net::HTTP.new(zhwikiurl.host, zhwikiurl.port)
 $https_char=='s'? zhwikihttp.use_ssl=true : zhwikihttp.use_ssl=false
 
-mw = MediaWiki::Gateway.new("http#{$https_char}://zh.wikipedia.org/w/api.php")
-mw.login('Fanchy-bot','bot/1991')
-mem=mw.category_members('分类:含未完成ISBN标签的页面')
+zhwikimw = MediaWiki::Gateway.new("http#{$https_char}://zh.wikipedia.org/w/api.php")
+zhwikimw.login('Fanchy-bot','bot/1991')
+mem=zhwikimw.category_members('分类:含未完成ISBN标签的页面')
 
 mem.each{|i|
 	content=zhwikihttp.request(Net::HTTP::Get.new((zhwikiurl.path+'/'+i).gsub(/ /,'_'))).body.force_encoding("UTF-8")
@@ -20,7 +20,7 @@ mem.each{|i|
 	next if isbn == nil
 	isbn=isbn[1]
 	isbn_nocheck=isbn[0..-2]
-	if mw.get(i) != nil
+	if zhwikimw.get(i) != nil
 		c=Cite::ISBN.new(isbn)
 		data=c.get
 		next if data == nil
@@ -31,5 +31,5 @@ mem.each{|i|
 		wikicontent=wikicontent+"|url=    <!--书籍链接-->\n|language=     <!--如果是简体中文请改为zh-hans，繁体中文为zh-hant-->\n|quote={{{quote|}}}<!--不要更改-->\n|page={{{page|}}}<!--不要更改-->\n|pages={{{pages|}}}<!--不要更改-->\n|ref={{{ref|}}}<!--不要更改-->\n}}"
 	end
 	wikititle=(isbn_nocheck.length == 9 ? "Template:Cite_isbn/978#{isbn_nocheck}" : "Template:Cite_isbn/#{isbn_nocheck}")
-	mw.create(wikititle, wikicontent)
+	zhwikimw.create(wikititle, wikicontent)
 }
